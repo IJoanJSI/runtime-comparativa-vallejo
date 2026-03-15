@@ -22,7 +22,7 @@ Las siguientes métricas fueron obtenidas ejecutando los scripts en un entorno d
 
 | Criterio | Node.js | Deno | Bun |
 | :--- | :--- | :--- | :--- |
-| **Tiempo de ejecución (ms)** | 3.78 ms | 3.35 ms | 12.23 ms |
+| **Tiempo de ejecución (ms)** | 4.21 ms | 18.79 ms | 11.5 ms |
 | **Líneas de código** | 74 | 66 | 65 |
 | **Requiere package.json** | Sí (Módulo ES/CommonJS) | No | Sí (Recomendado para resolución) |
 | **TypeScript nativo** | No (Requiere transpilador) | Sí | Sí |
@@ -37,7 +37,7 @@ Las siguientes métricas fueron obtenidas ejecutando los scripts en un entorno d
 Deno resultó ser el entorno con la curva de configuración más baja. A diferencia de Node.js, que requiere inicializar un proyecto y gestionar la configuración de módulos (como el caso del `package.json` para definir el tipo de exportación), Deno permite ejecutar archivos de forma aislada e interpreta TypeScript de manera nativa sin necesidad de archivos de configuración ni herramientas de terceros. Además, la implementación del "Top-Level Await" simplifica la estructura del código al no requerir envolver la lógica asíncrona en funciones adicionales.
 
 ### 2. ¿Qué diferencia de rendimiento encontraste y te sorprendió?
-Al analizar los tiempos de ejecución, Deno fue el más eficiente con 3.35 ms, seguido muy de cerca por Node.js con 3.78 ms. El hallazgo más sorpresivo fue que Bun, a pesar de estar diseñado específicamente para la velocidad extrema, registró el tiempo más alto con 12.23 ms en esta prueba particular. Para un volumen de 1000 registros, una diferencia de ~9 ms es imperceptible a nivel de usuario. Sin embargo, arquitectónicamente, este comportamiento en Bun puede explicarse por el costo del "cold start" (tiempo de inicialización del motor) al ejecutar un script tan corto, o por la interacción de sus APIs nativas de I/O en este sistema operativo específico. Si se evaluaran 100,000 registros o un servidor en ejecución continua, la tendencia de Bun probablemente se revertiría mostrando su verdadera capacidad sostenida.
+Al analizar los nuevos tiempos de ejecución, el hallazgo más sorpresivo fue que Node.js resultó ser el más rápido con 4.21 ms, superando a los runtimes de nueva generación. Bun registró 11.5 ms y Deno fue el más lento con 18.79 ms. Aunque para 1000 registros una diferencia de ~14 ms es imperceptible para el usuario final, a nivel arquitectónico es significativa. Este comportamiento demuestra que el módulo nativo `fs` de Node.js está extremadamente optimizado para lecturas sincrónicas en este entorno. El mayor tiempo en Deno y Bun se atribuye al costo del "cold start" (el tiempo que tarda el motor en inicializarse e interpretar TypeScript al vuelo) en un script de ejecución tan corta. Si evaluáramos 100,000 registros o un servidor en ejecución continua, este costo de inicio se diluiría y la arquitectura de Bun y Deno probablemente revertiría la tendencia, superando a Node.js.
 
 ### 3. Si mañana empiezas un proyecto nuevo, ¿cuál runtime eliges y por qué?
 La elección dependería estrictamente de los requerimientos de la arquitectura. 
